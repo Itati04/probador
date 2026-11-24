@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cambia el correo por el tuyo (el mismo que en config.js)
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['tu-correo@ejemplo.com'];
+    }
+
+    // Catálogo y ajustes: todos leen, solo la tienda escribe
+    match /catalog/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Pedidos: cada cliente solo ve y crea los suyos; la tienda ve todos
+    match /orders/{uid} {
+      allow read, write: if isAdmin()
+        || (request.auth != null && request.auth.uid == uid);
+    }
+  }
+}

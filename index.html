@@ -1,0 +1,1177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F5257">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Probador">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Probador virtual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#EEF1F0; --surface:#FFFFFF; --surface-2:#F6F8F7; --ink:#1D1A24; --muted:#5A6364; --line:#CDD5D3;
+  --primary:#0F5257; --on-primary:#FFFFFF; --blush:#F4B4C2; --stage:#DCE4E2; --danger:#B3261E; --ok:#1F7A4D;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Instrument Sans","Helvetica Neue","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111615; --surface:#1A2120; --surface-2:#202928; --ink:#E7EDEC; --muted:#9AA6A5; --line:#2F3937;
+    --primary:#6CC9CE; --on-primary:#06292B; --blush:#C9798C; --stage:#232C2B; --danger:#F2B8B5; --ok:#7FD3A8;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111615; --surface:#1A2120; --surface-2:#202928; --ink:#E7EDEC; --muted:#9AA6A5; --line:#2F3937;
+  --primary:#6CC9CE; --on-primary:#06292B; --blush:#C9798C; --stage:#232C2B; --danger:#F2B8B5; --ok:#7FD3A8;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+img,canvas,video{max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1;margin:0}
+p{margin:0}
+.hidden{display:none!important}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:10px 20px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.3rem;letter-spacing:-.03em;background:none;border:0;padding:0;cursor:pointer}
+.brand-mark{width:26px;height:32px;border-radius:13px 13px 4px 4px;background:var(--blush);display:grid;place-items:center}
+.brand-mark span{width:16px;height:22px;border-radius:8px 8px 2px 2px;background:var(--primary)}
+.topnav{margin-left:auto;display:none;gap:4px}
+.topnav a{padding:.45em .95em;border-radius:999px;text-decoration:none;color:var(--ink);font-weight:500}
+.topnav a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:9;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 9px;font-size:.72rem;font-weight:500;color:var(--muted);text-decoration:none;position:relative}
+.tabs a svg{width:23px;height:23px}
+.tabs a[aria-current="page"]{color:var(--primary)}
+.badge{position:absolute;top:3px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--blush);color:#2A1219;font-size:.68rem;font-weight:600;display:grid;place-items:center}
+.topnav .badge{position:static;display:inline-grid;margin-left:6px}
+@media (min-width:820px){.topnav{display:flex}.tabs{display:none}}
+
+main{max-width:1180px;margin:0 auto;padding:22px 16px 112px}
+@media (min-width:820px){main{padding:30px 24px 56px}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:.55em 1.15em;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--primary);color:var(--on-primary);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.danger{color:var(--danger)}
+.btn.small{min-height:36px;padding:.3em .85em;font-size:.9rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn svg{width:18px;height:18px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.muted{color:var(--muted)}
+.small-text{font-size:.88rem}
+
+.hero{display:grid;gap:14px;padding:8px 0 26px;max-width:40rem}
+.hero h1{font-size:clamp(2.1rem,7vw,3.6rem);font-weight:700}
+.hero p{font-size:1.1rem;color:var(--muted);max-width:34rem}
+.hero .row{margin-top:6px}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.4em .95em;font-weight:500;cursor:pointer;font-size:.93rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:14px}
+@media (min-width:820px){.grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px}}
+.card{display:flex;flex-direction:column;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0;overflow:hidden;cursor:pointer}
+.card:hover{border-color:var(--ink)}
+.thumb{background:var(--stage);display:grid;place-items:center;aspect-ratio:4/5;padding:14px;overflow:hidden}
+.thumb canvas{max-width:100%;max-height:100%;width:auto;height:auto}
+.card-body{padding:10px 12px 13px;display:grid;gap:4px}
+.card-name{font-weight:600;line-height:1.25}
+.card-price{font-family:var(--display);font-weight:600;font-size:1.05rem}
+.dots{display:flex;gap:5px}
+.dot{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.18)}
+
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:18px;padding:28px 22px;display:grid;gap:12px;justify-items:start;max-width:36rem}
+.empty h2{font-size:1.4rem}
+.note{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:.9rem;color:var(--muted);margin-bottom:16px}
+
+/* Probador */
+.tryon{display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:920px){.tryon{grid-template-columns:minmax(0,1.05fr) minmax(330px,.95fr);align-items:start}}
+.stage-col{display:grid;gap:14px;justify-items:center;min-width:0}
+@media (min-width:920px){.stage-col{position:sticky;top:84px}}
+.mirror{background:var(--blush);padding:10px;border-radius:50% 50% 22px 22px / 170px 170px 22px 22px;max-width:100%}
+.mirror-inner{border-radius:50% 50% 14px 14px / 160px 160px 14px 14px;overflow:hidden;background:var(--stage);display:grid;place-items:center}
+.mirror canvas{display:block;touch-action:none;cursor:grab}
+.mirror canvas:active{cursor:grabbing}
+.stage-empty{width:min(78vw,330px);aspect-ratio:3/4.4;display:grid;align-content:center;justify-items:center;gap:14px;padding:44px 26px 26px;text-align:center}
+.stage-empty h2{font-size:1.5rem}
+.stage-empty p{color:var(--muted);font-size:.95rem}
+.stage-empty .col{display:grid;gap:8px;width:100%}
+.stage-tip{font-size:.85rem;color:var(--muted);text-align:center;max-width:30rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:14px;min-width:0}
+.panel h2{font-size:1.25rem}
+.panel h3{font-size:1rem;font-family:var(--body);font-weight:600;letter-spacing:0}
+.strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.strip-item{flex:none;width:96px;display:grid;gap:4px;background:none;border:1px solid var(--line);border-radius:12px;padding:6px;cursor:pointer;text-align:left}
+.strip-item:hover{border-color:var(--ink)}
+.strip-item .thumb{aspect-ratio:1;border-radius:8px;padding:6px}
+.strip-item span{font-size:.76rem;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatch{width:34px;height:34px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
+.sizes{display:flex;flex-wrap:wrap;gap:6px}
+.size{min-width:46px;min-height:40px;border:1px solid var(--line);background:var(--surface);border-radius:10px;font-weight:600;cursor:pointer;padding:0 10px}
+.size[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.field{display:grid;gap:6px}
+.field>label,.field>.label{font-weight:600;font-size:.92rem}
+.range{display:flex;align-items:center;gap:10px}
+.range input{flex:1;accent-color:var(--primary)}
+.layers{display:grid;gap:6px}
+.layer{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:6px 8px;background:var(--surface);cursor:pointer;text-align:left;width:100%}
+.layer[aria-pressed="true"]{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary)}
+.layer .thumb{width:44px;height:44px;aspect-ratio:auto;padding:4px;border-radius:8px;flex:none}
+.layer div{min-width:0}
+.layer strong{display:block;font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.layer small{color:var(--muted)}
+.look-total{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:14px;flex-wrap:wrap}
+.look-total strong{font-family:var(--display);font-size:1.4rem}
+.sel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* Carrito y pedidos */
+.page-title{font-size:clamp(1.8rem,5vw,2.6rem);margin-bottom:18px}
+.list{display:grid;gap:10px}
+.item{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.item .thumb{width:72px;height:72px;aspect-ratio:auto;padding:6px;border-radius:10px}
+.item-name{font-weight:600}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.qty button{width:36px;height:34px;border:0;background:none;cursor:pointer;font-size:1.1rem}
+.qty span{min-width:26px;text-align:center;font-weight:600}
+.summary{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px;margin-top:16px;max-width:30rem;margin-left:auto}
+.summary .total{display:flex;justify-content:space-between;font-family:var(--display);font-size:1.4rem;font-weight:700}
+.order{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:8px}
+.order-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.order ul{margin:0;padding-left:1.1em;color:var(--muted);font-size:.93rem}
+.status{display:inline-block;padding:.15em .7em;border-radius:999px;font-size:.82rem;font-weight:600;background:var(--surface-2);border:1px solid var(--line)}
+.status.paid{background:color-mix(in srgb,var(--ok) 15%,transparent);border-color:transparent;color:var(--ok)}
+.status.cancel{color:var(--danger)}
+
+/* Gestión */
+.subtabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.admin-row{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 10px}
+.admin-row .thumb{width:56px;height:56px;aspect-ratio:auto;padding:4px;border-radius:8px}
+.admin-row.off{opacity:.6}
+
+/* Formularios */
+input[type=text],input[type=number],input[type=email],input[type=tel],input[type=password],select,textarea{width:100%;min-height:44px;padding:.55em .8em;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+.form{display:grid;gap:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.95rem}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--primary)}
+.checker{background-color:#fff;background-image:conic-gradient(#e4e4e4 25%,transparent 0 50%,#e4e4e4 0 75%,transparent 0);background-size:20px 20px;border-radius:12px;border:1px solid var(--line);min-height:200px;display:grid;place-items:center;padding:10px}
+.checker canvas{max-height:260px;width:auto}
+.color-row{display:grid;grid-template-columns:48px 1fr auto auto;gap:8px;align-items:center}
+.color-row input[type=color]{width:48px;height:44px;padding:2px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.mini{width:40px;height:40px;border-radius:8px;overflow:hidden;display:grid;place-items:center}
+.mini canvas{max-width:100%;max-height:100%}
+
+dialog{border:0;border-radius:20px;padding:0;width:min(560px,calc(100% - 20px));max-height:calc(100% - 24px);background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(10,14,14,.5)}
+.dlg{display:grid;gap:16px;padding:20px;max-height:calc(100dvh - 24px);overflow:auto}
+.dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.dlg-head h2{font-size:1.45rem}
+.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:1.2rem;flex:none}
+.prod-preview{background:var(--stage);border-radius:16px;display:grid;place-items:center;padding:18px;min-height:240px}
+.prod-preview canvas{max-height:300px;width:auto}
+.price-big{font-family:var(--display);font-weight:700;font-size:1.6rem}
+.cam-wrap{position:relative;background:#000;border-radius:14px;overflow:hidden;display:grid;place-items:center;min-height:300px}
+.cam-wrap video{display:block;width:100%;max-height:62vh;object-fit:contain}
+.countdown{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:6rem;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.6);pointer-events:none}
+.err{color:var(--danger);font-size:.9rem}
+
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.7em 1.1em;border-radius:12px;font-weight:500;z-index:30;max-width:calc(100% - 32px);opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+@media (min-width:820px){#toast{bottom:28px}}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="brand" id="brand" type="button" aria-label="Ir al catálogo"><span class="brand-mark" aria-hidden="true"><span></span></span><span id="storeName">Probador</span></button>
+  <nav class="topnav" id="topnav" aria-label="Principal"></nav>
+</header>
+<main id="view" tabindex="-1"></main>
+<nav class="tabs" id="tabs" aria-label="Principal"></nav>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="fileCam" accept="image/*" capture="user" hidden>
+<input type="file" id="fileGal" accept="image/*" hidden>
+
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ---------- Utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'style') e.style.cssText = v;
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else if (k === 'value' || k === 'checked') e[k] = v;
+    else e.setAttribute(k, v === true ? '' : String(v));
+  }
+  for (const c of kids.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    e.append(c instanceof Node ? c : String(c));
+  }
+  return e;
+}
+const svgIcon = (d) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '1.8'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); s.innerHTML = d; return s; };
+const ICONS = {
+  catalogo: '<path d="M4 7h16M4 12h16M4 17h10"/>',
+  probador: '<path d="M7 21V9a5 5 0 0 1 10 0v12"/><path d="M5 21h14"/><path d="M12 13v4"/>',
+  carrito: '<path d="M5 8h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  pedidos: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+  gestion: '<path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+  person: '<circle cx="12" cy="5" r="2.5"/><path d="M8 21l1-9-3-2 2-2h8l2 2-3 2 1 9"/>',
+  download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'
+};
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2800); }
+const uidGen = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const isHex = (s) => typeof s === 'string' && /^#[0-9a-f]{6}$/i.test(s);
+const fmtDate = (iso) => { try { return new Date(iso).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return ''; } };
+function money(n) {
+  const cur = S.settings.currency || 'EUR';
+  try { return new Intl.NumberFormat('es', { style: 'currency', currency: cur }).format(Number(n) || 0); }
+  catch { return (Number(n) || 0).toFixed(2) + ' ' + cur; }
+}
+function lsGet(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } }
+
+/* ---------- Categorías y colocación por defecto ---------- */
+const CATS = {
+  top:      { label: 'Partes de arriba', y: .405, w: .72, sizes: ['XS','S','M','L','XL'] },
+  dress:    { label: 'Vestidos', y: .55, w: .8, sizes: ['XS','S','M','L','XL'] },
+  bottom:   { label: 'Pantalones y faldas', y: .72, w: .42, sizes: ['36','38','40','42','44'] },
+  glasses:  { label: 'Gafas', y: .115, w: .22, sizes: ['Única'] },
+  hat:      { label: 'Gorras y sombreros', y: .073, w: .31, sizes: ['S/M','L/XL'] },
+  necklace: { label: 'Collares', y: .245, w: .2, sizes: ['Única'] },
+  shoes:    { label: 'Calzado', y: .95, w: .34, sizes: ['37','38','39','40','41','42'] },
+  other:    { label: 'Otros', y: .5, w: .3, sizes: ['Única'] }
+};
+const CURRENCIES = ['EUR','USD','MXN','COP','ARS','CLP','PEN','GTQ','DOP','UYU'];
+const STATUSES = ['Pagado','Pendiente de pago','Preparando','Enviado','Entregado','Cancelado'];
+
+/* ---------- Productos de ejemplo (imágenes base claras para poder teñirlas) ---------- */
+const SV = (w, hh, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${hh}" viewBox="0 0 ${w} ${hh}">${body}</svg>`;
+const SAMPLES = [
+  { name: 'Camiseta básica de algodón', price: 19.9, category: 'top', description: 'Corte recto, cuello redondo y algodón suave.', sizes: ['XS','S','M','L','XL'],
+    colors: [{name:'Blanco',hex:'#FFFFFF'},{name:'Negro',hex:'#2E2E30'},{name:'Azul marino',hex:'#24395F'},{name:'Rojo',hex:'#C23A3F'}],
+    svg: SV(400, 380, '<path d="M140 20 Q200 52 260 20 L340 55 L395 140 L335 172 L310 132 L310 368 L90 368 L90 132 L65 172 L5 140 L60 55 Z" fill="#F2F2F2" stroke="#BDBDBD" stroke-width="3" stroke-linejoin="round"/><path d="M140 20 Q200 70 260 20" fill="none" stroke="#B5B5B5" stroke-width="5"/><path d="M90 132 L90 200 M310 132 L310 200" stroke="#D4D4D4" stroke-width="3"/><path d="M150 230 Q170 300 160 360 M250 240 Q240 300 255 360" fill="none" stroke="#E0E0E0" stroke-width="6" stroke-linecap="round"/>') },
+  { name: 'Sudadera con capucha', price: 39.9, category: 'top', description: 'Felpa cálida, bolsillo canguro y cordones.', sizes: ['XS','S','M','L','XL'],
+    colors: [{name:'Gris jaspeado',hex:'#B9BCC0'},{name:'Verde bosque',hex:'#3C5A45'},{name:'Mostaza',hex:'#D2A13A'},{name:'Negro',hex:'#2E2E30'}],
+    svg: SV(420, 430, '<path d="M150 45 Q150 2 210 2 Q270 2 270 45 Z" fill="#E2E2E2" stroke="#BDBDBD" stroke-width="3"/><path d="M150 42 Q210 78 270 42 L350 72 L412 330 L362 344 L322 175 L322 412 L98 412 L98 175 L58 344 L8 330 L70 72 Z" fill="#F0F0F0" stroke="#BDBDBD" stroke-width="3" stroke-linejoin="round"/><path d="M98 392 L322 392" stroke="#C9C9C9" stroke-width="4"/><path d="M140 290 L280 290 L298 368 L122 368 Z" fill="none" stroke="#C9C9C9" stroke-width="3"/><path d="M195 70 L190 150 M225 70 L230 150" stroke="#BDBDBD" stroke-width="3" stroke-linecap="round"/>') },
+  { name: 'Vestido de tirantes', price: 34.9, category: 'dress', description: 'Vestido fluido con cintura marcada.', sizes: ['XS','S','M','L','XL'],
+    colors: [{name:'Coral',hex:'#F0786A'},{name:'Lavanda',hex:'#B6A6E0'},{name:'Negro',hex:'#2E2E30'}],
+    svg: SV(360, 520, '<path d="M118 8 L132 8 L140 92 L220 92 L228 8 L242 8 L250 112 Q262 170 232 200 L346 512 L14 512 L128 200 Q98 170 110 112 Z" fill="#F1F1F1" stroke="#BDBDBD" stroke-width="3" stroke-linejoin="round"/><path d="M128 200 Q180 218 232 200" fill="none" stroke="#BDBDBD" stroke-width="4"/><path d="M150 240 L110 505 M180 240 L180 505 M210 240 L250 505" stroke="#E0E0E0" stroke-width="4"/>') },
+  { name: 'Pantalón recto', price: 32, category: 'bottom', description: 'Tiro medio y pierna recta.', sizes: ['36','38','40','42','44'],
+    colors: [{name:'Denim',hex:'#4A6A94'},{name:'Beige',hex:'#CDB892'},{name:'Negro',hex:'#2E2E30'}],
+    svg: SV(300, 480, '<path d="M38 8 L262 8 L288 472 L176 472 L150 150 L124 472 L12 472 Z" fill="#EDEDED" stroke="#BDBDBD" stroke-width="3" stroke-linejoin="round"/><path d="M38 40 L262 40" stroke="#C4C4C4" stroke-width="4"/><path d="M150 40 L150 130" stroke="#C4C4C4" stroke-width="3"/><path d="M70 60 Q95 90 120 60 M180 60 Q205 90 230 60" fill="none" stroke="#D0D0D0" stroke-width="3"/>') },
+  { name: 'Gafas de sol redondas', price: 24.5, category: 'glasses', description: 'Montura ligera y lentes con protección UV.', sizes: ['Única'],
+    colors: [{name:'Carey',hex:'#8B5A2B'},{name:'Negro',hex:'#2A2A2A'},{name:'Dorado',hex:'#D4A537'}],
+    svg: SV(400, 130, '<path d="M18 42 L2 32 M382 42 L398 32" stroke="#DADADA" stroke-width="9" stroke-linecap="round"/><rect x="18" y="22" width="150" height="92" rx="40" fill="#2A2A30" fill-opacity="0.88" stroke="#E4E4E4" stroke-width="10"/><rect x="232" y="22" width="150" height="92" rx="40" fill="#2A2A30" fill-opacity="0.88" stroke="#E4E4E4" stroke-width="10"/><path d="M168 54 Q200 36 232 54" fill="none" stroke="#E4E4E4" stroke-width="10"/>') },
+  { name: 'Gorra clásica', price: 15, category: 'hat', description: 'Seis paneles y cierre ajustable.', sizes: ['S/M','L/XL'],
+    colors: [{name:'Negro',hex:'#2E2E30'},{name:'Rojo',hex:'#C23A3F'},{name:'Blanco',hex:'#FFFFFF'}],
+    svg: SV(400, 220, '<path d="M62 168 Q62 22 200 22 Q338 22 338 168 Z" fill="#EFEFEF" stroke="#BDBDBD" stroke-width="3"/><path d="M200 22 L200 168 M130 35 Q105 100 110 168 M270 35 Q295 100 290 168" fill="none" stroke="#D0D0D0" stroke-width="3"/><circle cx="200" cy="24" r="9" fill="#DADADA"/><path d="M50 165 Q200 200 350 165 Q330 212 200 214 Q70 212 50 165 Z" fill="#E4E4E4" stroke="#BDBDBD" stroke-width="3"/>') },
+  { name: 'Collar con colgante', price: 12.9, category: 'necklace', description: 'Cadena fina con colgante en forma de gota.', sizes: ['Única'],
+    colors: [{name:'Dorado',hex:'#D4A537'},{name:'Plateado',hex:'#C9CED6'}],
+    svg: SV(300, 220, '<path d="M8 8 Q150 262 292 8" fill="none" stroke="#DADADA" stroke-width="5" stroke-dasharray="7 4" stroke-linecap="round"/><path d="M150 132 Q170 162 150 198 Q130 162 150 132 Z" fill="#EAEAEA" stroke="#B8B8B8" stroke-width="3"/><circle cx="150" cy="132" r="6" fill="#D0D0D0"/>') }
+];
+const MANNEQUIN = SV(600, 1000, '<rect width="600" height="1000" fill="#E6ECEA"/><ellipse cx="300" cy="975" rx="170" ry="16" fill="#D0D8D6"/><g fill="#C1CAC8"><circle cx="300" cy="112" r="58"/><rect x="278" y="160" width="44" height="60" rx="14"/><path d="M190 215 Q300 196 410 215 Q440 222 446 260 L470 540 Q472 562 452 562 Q436 562 432 540 L404 300 L384 470 L396 540 L204 540 L216 470 L196 300 L168 540 Q164 562 148 562 Q128 562 130 540 L154 260 Q160 222 190 215 Z"/><path d="M206 530 L394 530 L372 950 Q370 966 350 966 L318 966 Q306 966 305 950 L300 640 L295 950 Q294 966 282 966 L250 966 Q230 966 228 950 Z"/></g>');
+const svgData = (svg) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+/* ---------- Estado ---------- */
+const S = {
+  mode: 'loading', db: null, assets: null, user: null, downloads: null,
+  uid: null, isAdmin: false, canWrite: null, loaded: false, offlineNote: '',
+  products: [], settings: { name: 'Probador', currency: 'EUR' },
+  myOrders: [], allOrders: [],
+  cart: lsGet('probador.cart', []),
+  route: 'catalogo', cat: 'all', adminTab: 'productos',
+  photo: null, isMannequin: false, layers: [], sel: null
+};
+let L = null; // datos del modo local
+
+/* ---------- Imágenes ---------- */
+const imgCache = new Map(), tintCache = new Map();
+function srcOf(ref) {
+  if (typeof ref !== 'string') return null;
+  if (/^[0-9a-f]{32}$/.test(ref)) return '/_blob/' + ref;
+  if (ref.startsWith('data:image/')) return ref;
+  return null;
+}
+function loadImg(src) {
+  if (!src) return Promise.reject(new Error('sin imagen'));
+  if (!imgCache.has(src)) imgCache.set(src, new Promise((res, rej) => {
+    const i = new Image(); i.decoding = 'async';
+    i.onload = () => res(i); i.onerror = () => { imgCache.delete(src); rej(new Error('no carga')); };
+    i.src = src;
+  }));
+  return imgCache.get(src);
+}
+const dims = (s) => [s.naturalWidth || s.width, s.naturalHeight || s.height];
+async function variant(p, ci) {
+  const c = (p.colors || [])[ci];
+  const own = c && srcOf(c.image);
+  if (own) return loadImg(own);
+  const base = await loadImg(srcOf(p.image));
+  if (!p.tint || !c || !isHex(c.hex)) return base;
+  const key = p.image + '|' + c.hex;
+  if (tintCache.has(key)) return tintCache.get(key);
+  const [w, hh] = dims(base);
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = hh;
+  const x = cv.getContext('2d');
+  x.drawImage(base, 0, 0, w, hh);
+  x.globalCompositeOperation = 'multiply'; x.fillStyle = c.hex; x.fillRect(0, 0, w, hh);
+  x.globalCompositeOperation = 'destination-in'; x.drawImage(base, 0, 0, w, hh);
+  tintCache.set(key, cv);
+  return cv;
+}
+function drawFit(cv, src, max) {
+  const [w, hh] = dims(src); const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const s = Math.min(max / w, max / hh, 1.5);
+  cv.width = Math.max(1, Math.round(w * s * dpr)); cv.height = Math.max(1, Math.round(hh * s * dpr));
+  cv.style.width = Math.round(w * s) + 'px'; cv.style.height = Math.round(hh * s) + 'px';
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+}
+function thumb(p, ci = 0, max = 220) {
+  const box = h('div', { class: 'thumb' }); const cv = h('canvas', { 'aria-hidden': 'true' }); box.append(cv);
+  if (p) variant(p, ci).then(src => drawFit(cv, src, max)).catch(() => {});
+  return box;
+}
+
+/* ---------- Capa de datos ---------- */
+async function boot() {
+  route(); renderNav();
+  const view = $('#view'); view.replaceChildren(h('p', { class: 'muted' }, 'Cargando la tienda…'));
+  let db = null, user = null;
+  if (window.claude && typeof window.claude.use === 'function') {
+    [db, user, S.downloads] = await Promise.all([
+      window.claude.use('db').catch(() => null),
+      window.claude.use('user').catch(() => null),
+      window.claude.use('downloads').catch(() => null)
+    ]);
+  }
+  if (db) await startRemote(db, user);
+  else if (firebaseReady()) {
+    try { await startFirebase(); }
+    catch (e) { console.error(e); S.fbError = 'No se pudo conectar con Firebase. Revisa config.js y que la autenticación anónima esté activada.'; startLocal(); }
+  } else startLocal();
+  renderNav(); mount();
+}
+async function startRemote(db, user) {
+  S.backend = 'claude'; S.user = user;
+  if (user) {
+    try { S.uid = await user.id(); } catch {}
+    try { S.isAdmin = await user.canEdit(); } catch {}
+    try { S.canWrite = await user.can('data.write'); } catch {}
+  }
+  if (S.isAdmin) { try { S.assets = await window.claude.use('assets'); } catch {} }
+  subscribe(db);
+}
+function firebaseReady() { const c = window.FIREBASE_CONFIG; return !!(window.firebase && c && c.apiKey && c.projectId); }
+async function startFirebase() {
+  firebase.initializeApp(window.FIREBASE_CONFIG);
+  const auth = firebase.auth(); const fs = firebase.firestore();
+  try { await fs.enablePersistence({ synchronizeTabs: true }); } catch {}
+  const u = await new Promise((res, rej) => {
+    const un = auth.onAuthStateChanged(async (usr) => {
+      if (usr) { un(); res(usr); return; }
+      try { await auth.signInAnonymously(); } catch (e) { un(); rej(e); }
+    });
+  });
+  S.backend = 'firebase'; S.auth = auth; S.uid = u.uid;
+  const admins = (window.ADMIN_EMAILS || []).map(e => String(e).trim().toLowerCase());
+  S.isAdmin = !u.isAnonymous && !!u.email && admins.includes(u.email.toLowerCase());
+  subscribe(fs);
+}
+function subscribe(db) {
+  S.mode = 'remote'; S.db = db;
+  const timer = setTimeout(() => { if (!S.loaded) { S.offlineNote = 'No se puede conectar con el catálogo todavía. Revisa tu conexión.'; refresh(); } }, 10000);
+  db.collection('catalog').onSnapshot(snap => {
+    S.products = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    if (!snap.metadata.fromCache) { S.loaded = true; S.offlineNote = ''; clearTimeout(timer); }
+    else S.loaded = S.loaded || snap.size > 0;
+    pruneLayers(); refresh();
+  }, () => { clearTimeout(timer); S.loaded = true; S.offlineNote = 'El catálogo no está disponible ahora mismo.'; refresh(); });
+  db.doc('settings/store').onSnapshot(s => { if (s.exists) S.settings = { ...S.settings, ...s.data() }; applySettings(); refresh(); }, () => {});
+  if (S.uid) db.doc('orders/' + S.uid).onSnapshot(s => { S.myOrders = s.exists ? (s.data().list || []) : []; if (S.route === 'pedidos') refresh(); }, () => {});
+  if (S.isAdmin) db.collection('orders').onSnapshot(s => {
+    S.allOrders = s.docs.flatMap(d => (d.data().list || []).map(o => ({ ...o, _owner: d.id }))).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    if (S.route === 'gestion') refresh();
+  }, () => {});
+}
+function startLocal() {
+  S.mode = 'local'; S.isAdmin = true; S.loaded = true;
+  L = lsGet('probador.local', { products: [], settings: { name: 'Probador', currency: 'EUR' }, orders: [] });
+  S.products = L.products; S.settings = { ...S.settings, ...L.settings };
+  S.myOrders = L.orders; S.allOrders = L.orders.map(o => ({ ...o, _owner: 'local' }));
+  applySettings();
+}
+function saveLocal() {
+  const ok = lsSet('probador.local', L);
+  S.products = L.products; S.myOrders = L.orders; S.allOrders = L.orders.map(o => ({ ...o, _owner: 'local' }));
+  if (!ok) toast('El navegador no tiene más espacio para guardar imágenes.');
+}
+function applySettings() {
+  const n = S.settings.name || 'Probador';
+  $('#storeName').textContent = n; document.title = n + ' · probador virtual';
+}
+
+async function canvasToBlob(cv, type = 'image/png', q) { return new Promise((res, rej) => cv.toBlob(b => b ? res(b) : rej(new Error('blob')), type, q)); }
+async function storeImage(cv) {
+  if (S.mode === 'remote' && S.backend === 'claude') {
+    if (!S.assets) throw new Error('No tienes permiso para subir imágenes en esta vista.');
+    const blob = await canvasToBlob(cv);
+    const up = await S.assets.upload(blob, { type: 'image/png' });
+    return up.id;
+  }
+  return compactData(shrink(cv, S.backend === 'firebase' ? 800 : 700));
+}
+function compactData(cv) { const w = cv.toDataURL('image/webp', 0.85); return w.startsWith('data:image/webp') ? w : cv.toDataURL('image/png'); }
+async function storeSvg(svg) {
+  if (S.mode === 'remote' && S.backend === 'claude') {
+    if (!S.assets) throw new Error('No tienes permiso para subir imágenes en esta vista.');
+    const up = await S.assets.upload(new Blob([svg], { type: 'image/svg+xml' }), { type: 'image/svg+xml' });
+    return up.id;
+  }
+  try { const img = await loadImg(svgData(svg)); const cv = document.createElement('canvas'); [cv.width, cv.height] = dims(img); cv.getContext('2d').drawImage(img, 0, 0); return cv.toDataURL('image/png'); }
+  catch { return svgData(svg); }
+}
+async function saveProductRecord(id, rec) {
+  if (S.backend === 'firebase' && JSON.stringify(rec).length > 950000) throw new Error('Las fotos ocupan demasiado. Usa imágenes más pequeñas o menos colores con foto propia.');
+  if (S.mode === 'remote') {
+    const ref = id ? S.db.doc('catalog/' + id) : S.db.collection('catalog').doc();
+    await ref.set(rec);
+  } else {
+    if (id) { const i = L.products.findIndex(p => p.id === id); if (i >= 0) L.products[i] = { id, ...rec }; }
+    else L.products.unshift({ id: uidGen(), ...rec });
+    saveLocal(); refresh();
+  }
+}
+async function deleteProduct(p) {
+  if (S.mode === 'remote') {
+    await S.db.doc('catalog/' + p.id).delete();
+    const ids = [p.image, ...(p.colors || []).map(c => c.image)].filter(x => /^[0-9a-f]{32}$/.test(x || ''));
+    if (S.assets) for (const a of ids) { try { await S.assets.delete(a); } catch {} }
+  } else { L.products = L.products.filter(x => x.id !== p.id); saveLocal(); refresh(); }
+}
+async function placeOrder(order) {
+  if (S.mode === 'local') { L.orders.unshift(order); saveLocal(); return; }
+  if (!S.uid) { const e = new Error('Inicia sesión para hacer pedidos.'); throw e; }
+  const ref = S.db.doc('orders/' + S.uid);
+  const snap = await ref.get();
+  const list = snap.exists ? [...(snap.data().list || [])] : [];
+  list.unshift(order);
+  await ref.set({ list: list.slice(0, 150) });
+}
+async function setOrderStatus(owner, orderId, status) {
+  if (S.mode === 'local') { const o = L.orders.find(x => x.id === orderId); if (o) o.status = status; saveLocal(); return; }
+  const ref = S.db.doc('orders/' + owner);
+  const snap = await ref.get(); if (!snap.exists) return;
+  const list = (snap.data().list || []).map(o => o.id === orderId ? { ...o, status } : o);
+  await ref.set({ list });
+}
+async function saveSettings(st) {
+  if (S.mode === 'remote') await S.db.doc('settings/store').set(st);
+  else { L.settings = st; S.settings = { ...S.settings, ...st }; saveLocal(); applySettings(); }
+}
+
+/* ---------- Navegación ---------- */
+const ROUTES = ['catalogo', 'probador', 'carrito', 'pedidos', 'gestion'];
+const LABELS = { catalogo: 'Catálogo', probador: 'Probador', carrito: 'Carrito', pedidos: 'Pedidos', gestion: 'Gestión' };
+function route() { const r = (location.hash || '').slice(1); S.route = ROUTES.includes(r) ? r : 'catalogo'; }
+function go(r) { if (location.hash.slice(1) === r) { route(); renderNav(); mount(); } else location.hash = r; }
+window.addEventListener('hashchange', () => { route(); renderNav(); mount(); window.scrollTo(0, 0); });
+$('#brand').addEventListener('click', () => go('catalogo'));
+const cartCount = () => S.cart.reduce((a, i) => a + (i.qty || 0), 0);
+function renderNav() {
+  const rs = ROUTES.filter(r => r !== 'gestion' || S.isAdmin);
+  const n = cartCount();
+  const mk = (r, withIcon) => h('a', { href: '#' + r, 'aria-current': S.route === r ? 'page' : null },
+    withIcon ? svgIcon(ICONS[r]) : null, LABELS[r],
+    r === 'carrito' && n ? h('span', { class: 'badge', 'aria-label': n + ' artículos' }, String(n)) : null);
+  $('#topnav').replaceChildren(...rs.map(r => mk(r, false)));
+  $('#tabs').replaceChildren(...rs.map(r => mk(r, true)));
+}
+const VIEWS = {};
+function mount() {
+  const v = $('#view');
+  if (S.route !== 'probador') teardownStage();
+  v.replaceChildren();
+  if (S.mode === 'loading') { v.append(h('p', { class: 'muted' }, 'Cargando la tienda…')); return; }
+  (VIEWS[S.route] || VIEWS.catalogo).mount(v);
+}
+function refresh() {
+  renderNav();
+  if (S.route === 'probador' && T.mounted) { renderStrip(); renderPanel(); requestDraw(); return; }
+  if (dlgBusy) return;
+  mount();
+}
+const visibleProducts = () => S.products.filter(p => p.active !== false && srcOf(p.image));
+
+/* ---------- Diálogo ---------- */
+const dlg = $('#dlg'); let dlgBusy = false; let onDlgClose = null;
+function openDialog(title, ...body) {
+  const content = h('div', { class: 'dlg' },
+    h('div', { class: 'dlg-head' }, h('h2', null, title), h('button', { class: 'x', type: 'button', 'aria-label': 'Cerrar', onclick: closeDialog }, '×')),
+    ...body);
+  dlg.replaceChildren(content); dlgBusy = true;
+  if (!dlg.open) dlg.showModal();
+  return content;
+}
+function closeDialog() { if (dlg.open) dlg.close(); }
+dlg.addEventListener('close', () => { dlgBusy = false; if (onDlgClose) { const f = onDlgClose; onDlgClose = null; f(); } dlg.replaceChildren(); if (S.route !== 'probador') mount(); });
+dlg.addEventListener('click', (e) => { if (e.target === dlg) closeDialog(); });
+
+/* ---------- Catálogo ---------- */
+VIEWS.catalogo = { mount(v) {
+  catalogBody(v);
+  if (S.backend === 'firebase' && !S.isAdmin) v.append(h('p', { class: 'muted small-text', style: 'margin-top:48px;text-align:center' }, h('a', { href: '#gestion', style: 'color:inherit' }, 'Acceso para la tienda')));
+} };
+function catalogBody(v) {
+  v.append(h('section', { class: 'hero' },
+    h('h1', null, 'Pruébatelo antes de pedirlo'),
+    h('p', null, 'Hazte una foto, viste tu imagen con las prendas y accesorios de la tienda, elige talla y color, y pide lo que te guste.'),
+    h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => go('probador') }, svgIcon(ICONS.camera), 'Abrir el probador'))));
+  if (S.offlineNote) v.append(h('div', { class: 'note' }, S.offlineNote));
+  if (S.mode === 'local') v.append(h('div', { class: 'note' }, S.fbError || 'Modo demostración: configura Firebase en config.js para guardar el catálogo y los pedidos en línea. Ahora todo se guarda solo en este navegador.'));
+  const prods = visibleProducts();
+  if (!S.loaded) { v.append(h('p', { class: 'muted' }, 'Cargando el catálogo…')); return; }
+  if (!prods.length) {
+    v.append(h('div', { class: 'empty' },
+      h('h2', null, 'Todavía no hay productos'),
+      S.isAdmin ? h('p', { class: 'muted' }, 'Añade tu primera prenda o carga los productos de ejemplo para probar la tienda.') : h('p', { class: 'muted' }, 'La tienda está preparando su catálogo. Vuelve pronto.'),
+      S.isAdmin ? h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => openProductForm(null) }, 'Añadir producto'), h('button', { class: 'btn', type: 'button', onclick: seedSamples }, 'Cargar productos de ejemplo')) : null));
+    return;
+  }
+  const cats = [...new Set(prods.map(p => p.category))].filter(c => CATS[c]);
+  if (S.cat !== 'all' && !cats.includes(S.cat)) S.cat = 'all';
+  v.append(h('div', { class: 'chips', role: 'group', 'aria-label': 'Filtrar por categoría' },
+    h('button', { class: 'chip', type: 'button', 'aria-pressed': String(S.cat === 'all'), onclick: () => { S.cat = 'all'; mount(); } }, 'Todo'),
+    cats.map(c => h('button', { class: 'chip', type: 'button', 'aria-pressed': String(S.cat === c), onclick: () => { S.cat = c; mount(); } }, CATS[c].label))));
+  const list = prods.filter(p => S.cat === 'all' || p.category === S.cat);
+  v.append(h('div', { class: 'grid' }, list.map(p => h('button', { class: 'card', type: 'button', onclick: () => openProduct(p) },
+    thumb(p, 0),
+    h('div', { class: 'card-body' },
+      h('div', { class: 'card-name' }, p.name || 'Producto'),
+      h('div', { class: 'card-price' }, money(p.price)),
+      h('div', { class: 'dots', 'aria-label': (p.colors || []).length + ' colores' }, (p.colors || []).slice(0, 6).map(c => h('span', { class: 'dot', style: 'background:' + (isHex(c.hex) ? c.hex : '#ccc') }))))))));
+}
+
+function openProduct(p) {
+  let ci = 0, si = Math.floor(((p.sizes || []).length - 1) / 2), qty = 1;
+  const prev = h('div', { class: 'prod-preview' });
+  const paint = () => { const cv = h('canvas', { 'aria-hidden': 'true' }); prev.replaceChildren(cv); variant(p, ci).then(s => drawFit(cv, s, 300)).catch(() => {}); };
+  const sw = h('div', { class: 'swatches', role: 'group', 'aria-label': 'Color' });
+  const colorName = h('span', { class: 'muted' });
+  const drawSw = () => { sw.replaceChildren(...(p.colors || []).map((c, i) => h('button', { class: 'swatch', type: 'button', style: 'background:' + (isHex(c.hex) ? c.hex : '#ccc'), 'aria-label': c.name || 'Color', 'aria-pressed': String(i === ci), onclick: () => { ci = i; drawSw(); paint(); } }))); colorName.textContent = (p.colors || [])[ci]?.name || ''; };
+  const sz = h('div', { class: 'sizes', role: 'group', 'aria-label': 'Talla' });
+  const drawSz = () => sz.replaceChildren(...(p.sizes || []).map((s, i) => h('button', { class: 'size', type: 'button', 'aria-pressed': String(i === si), onclick: () => { si = i; drawSz(); } }, s)));
+  const qtyEl = h('span', null, '1');
+  paint(); drawSw(); drawSz();
+  openDialog(p.name || 'Producto',
+    prev,
+    h('div', { class: 'row', style: 'justify-content:space-between' }, h('span', { class: 'price-big' }, money(p.price)), h('span', { class: 'muted small-text' }, CATS[p.category]?.label || '')),
+    p.description ? h('p', { class: 'muted' }, p.description) : null,
+    (p.colors || []).length ? h('div', { class: 'field' }, h('div', { class: 'label' }, 'Color ', colorName), sw) : null,
+    (p.sizes || []).length ? h('div', { class: 'field' }, h('div', { class: 'label' }, 'Talla'), sz) : null,
+    h('div', { class: 'field' }, h('div', { class: 'label' }, 'Cantidad'),
+      h('div', { class: 'qty' }, h('button', { type: 'button', 'aria-label': 'Quitar uno', onclick: () => { qty = Math.max(1, qty - 1); qtyEl.textContent = qty; } }, '−'), qtyEl, h('button', { type: 'button', 'aria-label': 'Añadir uno', onclick: () => { qty = Math.min(20, qty + 1); qtyEl.textContent = qty; } }, '+'))),
+    h('div', { class: 'row' },
+      h('button', { class: 'btn primary', type: 'button', onclick: () => { addLayer(p.id, ci, si); closeDialog(); go('probador'); } }, svgIcon(ICONS.probador), 'Probármelo'),
+      h('button', { class: 'btn', type: 'button', onclick: () => { addToCart(p, ci, si, qty); closeDialog(); toast('Añadido al carrito'); } }, 'Añadir al carrito')));
+}
+
+/* ---------- Carrito ---------- */
+function saveCart() { lsSet('probador.cart', S.cart); renderNav(); }
+function addToCart(p, ci, si, qty = 1) {
+  const c = (p.colors || [])[ci] || {}; const size = (p.sizes || [])[si] || '';
+  const key = p.id + '|' + ci + '|' + si;
+  const ex = S.cart.find(i => i.key === key);
+  if (ex) ex.qty = Math.min(99, ex.qty + qty);
+  else S.cart.push({ key, pid: p.id, ci, si, name: p.name, price: Number(p.price) || 0, color: c.name || '', hex: c.hex || '', size, qty });
+  saveCart();
+}
+const cartTotal = () => S.cart.reduce((a, i) => a + i.price * i.qty, 0);
+VIEWS.carrito = { mount(v) {
+  v.append(h('h1', { class: 'page-title' }, 'Carrito'));
+  if (!S.cart.length) {
+    v.append(h('div', { class: 'empty' }, h('h2', null, 'Tu carrito está vacío'), h('p', { class: 'muted' }, 'Pruébate algo en el probador y añádelo desde ahí, o elige en el catálogo.'),
+      h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'button', onclick: () => go('probador') }, 'Ir al probador'), h('button', { class: 'btn', type: 'button', onclick: () => go('catalogo') }, 'Ver catálogo'))));
+    return;
+  }
+  v.append(h('div', { class: 'list' }, S.cart.map(it => {
+    const p = S.products.find(x => x.id === it.pid);
+    return h('div', { class: 'item' },
+      thumb(p, it.ci, 80),
+      h('div', null, h('div', { class: 'item-name' }, it.name), h('div', { class: 'muted small-text' }, [it.size && 'Talla ' + it.size, it.color].filter(Boolean).join(', ')), h('div', { class: 'small-text' }, money(it.price)),
+        !p ? h('div', { class: 'err' }, 'Este producto ya no está disponible') : null),
+      h('div', { style: 'display:grid;gap:8px;justify-items:end' },
+        h('div', { class: 'qty' }, h('button', { type: 'button', 'aria-label': 'Quitar uno', onclick: () => { it.qty--; if (it.qty <= 0) S.cart = S.cart.filter(x => x !== it); saveCart(); mount(); } }, '−'), h('span', null, String(it.qty)), h('button', { type: 'button', 'aria-label': 'Añadir uno', onclick: () => { it.qty = Math.min(99, it.qty + 1); saveCart(); mount(); } }, '+')),
+        h('strong', null, money(it.price * it.qty))));
+  })));
+  const valid = S.cart.every(it => S.products.some(p => p.id === it.pid));
+  v.append(h('div', { class: 'summary' },
+    h('div', { class: 'total' }, h('span', null, 'Total'), h('span', null, money(cartTotal()))),
+    h('button', { class: 'btn primary', type: 'button', disabled: !valid, onclick: openCheckout }, 'Finalizar pedido'),
+    !valid ? h('p', { class: 'err' }, 'Quita los productos que ya no están disponibles para continuar.') : null));
+} };
+
+function luhn(num) { const d = num.replace(/\D/g, ''); if (d.length < 13 || d.length > 19) return false; let s = 0, alt = false; for (let i = d.length - 1; i >= 0; i--) { let n = +d[i]; if (alt) { n *= 2; if (n > 9) n -= 9; } s += n; alt = !alt; } return s % 10 === 0; }
+function openCheckout() {
+  if (S.mode === 'remote' && !S.uid) { toast('Inicia sesión para hacer pedidos.'); return; }
+  if (S.mode === 'remote' && S.canWrite === false) { toast('Tu acceso es solo de lectura. Pide a la tienda acceso de colaborador para hacer pedidos.'); return; }
+  const f = (id, label, type = 'text', extra = {}) => h('div', { class: 'field' }, h('label', { for: id }, label), h('input', { id, type, required: true, ...extra }));
+  const err = h('p', { class: 'err', role: 'alert' });
+  const card = h('div', { class: 'form' },
+    f('ccnum', 'Número de tarjeta', 'text', { inputmode: 'numeric', autocomplete: 'cc-number', placeholder: '4242 4242 4242 4242' }),
+    h('div', { class: 'two' }, f('ccexp', 'Caducidad (MM/AA)', 'text', { inputmode: 'numeric', autocomplete: 'cc-exp', placeholder: '12/28' }), f('cccvc', 'CVC', 'text', { inputmode: 'numeric', autocomplete: 'cc-csc', placeholder: '123' })),
+    h('p', { class: 'muted small-text' }, 'Pago de demostración: no se realiza ningún cargo real.'));
+  const pm = (val, label, checked) => h('label', { class: 'check' }, h('input', { type: 'radio', name: 'pm', value: val, checked, onchange: () => card.classList.toggle('hidden', val !== 'card') }), h('span', null, label));
+  const btn = h('button', { class: 'btn primary', type: 'submit' }, 'Pagar ' + money(cartTotal()));
+  const form = h('form', { class: 'form', novalidate: true, onsubmit: async (e) => {
+    e.preventDefault(); err.textContent = '';
+    const val = (id) => (form.querySelector('#' + id)?.value || '').trim();
+    const method = form.querySelector('input[name=pm]:checked').value;
+    const need = ['cname', 'cemail', 'cphone', 'caddr', 'ccity', 'czip'];
+    if (need.some(id => !val(id))) { err.textContent = 'Completa todos los datos de envío.'; return; }
+    if (!/^\S+@\S+\.\S+$/.test(val('cemail'))) { err.textContent = 'Escribe un correo válido.'; return; }
+    let last4 = '';
+    if (method === 'card') {
+      if (!luhn(val('ccnum'))) { err.textContent = 'El número de tarjeta no es válido.'; return; }
+      const m = val('ccexp').match(/^(\d{2})\s*\/\s*(\d{2})$/);
+      if (!m || +m[1] < 1 || +m[1] > 12) { err.textContent = 'Escribe la caducidad como MM/AA.'; return; }
+      const now = new Date(); const exp = new Date(2000 + +m[2], +m[1], 0, 23, 59);
+      if (exp < now) { err.textContent = 'La tarjeta está caducada.'; return; }
+      if (!/^\d{3,4}$/.test(val('cccvc'))) { err.textContent = 'El CVC tiene 3 o 4 cifras.'; return; }
+      last4 = val('ccnum').replace(/\D/g, '').slice(-4);
+    }
+    const order = {
+      id: uidGen(), createdAt: new Date().toISOString(),
+      items: S.cart.map(i => ({ pid: i.pid, name: i.name, price: i.price, size: i.size, color: i.color, qty: i.qty })),
+      total: Math.round(cartTotal() * 100) / 100, currency: S.settings.currency || 'EUR',
+      customer: { name: val('cname'), email: val('cemail'), phone: val('cphone'), address: val('caddr'), city: val('ccity'), zip: val('czip') },
+      payment: { method: method === 'card' ? 'Tarjeta' : 'Contra reembolso', last4 },
+      status: method === 'card' ? 'Pagado' : 'Pendiente de pago'
+    };
+    btn.disabled = true; btn.textContent = method === 'card' ? 'Procesando el pago…' : 'Enviando el pedido…';
+    try {
+      await new Promise(r => setTimeout(r, 700));
+      await placeOrder(order);
+      S.cart = []; saveCart(); closeDialog(); toast('Pedido realizado'); go('pedidos');
+    } catch (ex) {
+      btn.disabled = false; btn.textContent = 'Pagar ' + money(cartTotal());
+      err.textContent = ex && ex.code === 'invalid_argument' ? 'No tienes permiso para hacer pedidos. Pide a la tienda acceso de colaborador.' : (ex && ex.message && !ex.code ? ex.message : 'No se pudo guardar el pedido. Inténtalo de nuevo.');
+    }
+  } },
+    h('h3', null, 'Datos de envío'),
+    f('cname', 'Nombre y apellidos', 'text', { autocomplete: 'name' }),
+    h('div', { class: 'two' }, f('cemail', 'Correo', 'email', { autocomplete: 'email' }), f('cphone', 'Teléfono', 'tel', { autocomplete: 'tel' })),
+    f('caddr', 'Dirección', 'text', { autocomplete: 'street-address' }),
+    h('div', { class: 'two' }, f('ccity', 'Ciudad', 'text', { autocomplete: 'address-level2' }), f('czip', 'Código postal', 'text', { autocomplete: 'postal-code', inputmode: 'numeric' })),
+    h('h3', null, 'Pago'),
+    h('div', { class: 'form', style: 'gap:8px' }, pm('card', 'Tarjeta de crédito o débito', true), pm('cod', 'Pago contra reembolso', false)),
+    card, err, btn);
+  openDialog('Finalizar pedido', h('p', { class: 'muted' }, S.cart.length + (S.cart.length === 1 ? ' producto' : ' productos') + ', total ' + money(cartTotal())), form);
+}
+
+/* ---------- Mis pedidos ---------- */
+function statusChip(s) { return h('span', { class: 'status' + (s === 'Pagado' || s === 'Entregado' ? ' paid' : '') + (s === 'Cancelado' ? ' cancel' : '') }, s || 'Recibido'); }
+function orderCard(o, admin) {
+  const fmt = (n) => { try { return new Intl.NumberFormat('es', { style: 'currency', currency: o.currency || S.settings.currency || 'EUR' }).format(n); } catch { return money(n); } };
+  const c = o.customer || {};
+  return h('article', { class: 'order' },
+    h('div', { class: 'order-head' }, h('div', null, h('strong', null, 'Pedido ' + String(o.id || '').slice(0, 6).toUpperCase()), h('div', { class: 'muted small-text' }, fmtDate(o.createdAt))),
+      admin ? h('select', { 'aria-label': 'Estado del pedido', style: 'width:auto', onchange: async (e) => { try { await setOrderStatus(o._owner, o.id, e.target.value); toast('Estado actualizado'); if (S.mode === 'local') mount(); } catch { toast('No se pudo cambiar el estado.'); } } },
+        STATUSES.map(s => { const op = h('option', { value: s }, s); if (s === o.status) op.selected = true; return op; })) : statusChip(o.status)),
+    h('ul', null, (o.items || []).map(i => h('li', null, `${i.qty} × ${i.name}` + (i.size ? ', talla ' + i.size : '') + (i.color ? ', ' + i.color : '') + ' · ' + fmt(i.price * i.qty)))),
+    admin ? h('div', { class: 'small-text' }, h('div', null, h('strong', null, c.name || ''), ' · ', c.email || '', ' · ', c.phone || ''), h('div', { class: 'muted' }, [c.address, c.city, c.zip].filter(Boolean).join(', '))) : null,
+    h('div', { class: 'order-head' }, h('span', { class: 'muted small-text' }, (o.payment?.method || '') + (o.payment?.last4 ? ' terminada en ' + o.payment.last4 : '')), h('strong', null, fmt(o.total))));
+}
+VIEWS.pedidos = { mount(v) {
+  v.append(h('h1', { class: 'page-title' }, 'Mis pedidos'));
+  if (S.mode === 'remote' && !S.uid) { v.append(h('div', { class: 'empty' }, h('h2', null, 'Inicia sesión'), h('p', { class: 'muted' }, 'Necesitas iniciar sesión para ver y hacer pedidos.'))); return; }
+  if (!S.myOrders.length) { v.append(h('div', { class: 'empty' }, h('h2', null, 'Aún no has hecho pedidos'), h('p', { class: 'muted' }, 'Cuando pagues un pedido aparecerá aquí con su estado.'), h('button', { class: 'btn primary', type: 'button', onclick: () => go('catalogo') }, 'Ver catálogo'))); return; }
+  v.append(h('div', { class: 'list' }, S.myOrders.map(o => orderCard(o, false))));
+} };
+
+/* ---------- Probador ---------- */
+const T = { mounted: false, cv: null, ctx: null, wrap: null, strip: null, panel: null, raf: 0, ptrs: new Map(), drag: null, pinch: null, ro: null };
+function teardownStage() { T.mounted = false; if (T.ro) { T.ro.disconnect(); T.ro = null; } }
+function sizeFactor(Ly, p) { const n = (p.sizes || []).length; if (n <= 1) return 1; return 1 + (Ly.si - (n - 1) / 2) * 0.05; }
+function addLayer(pid, ci = 0, si = 0) {
+  const p = S.products.find(x => x.id === pid); if (!p) return;
+  const d = CATS[p.category] || CATS.other;
+  // si ya hay una prenda de la misma categoría en arriba/vestido/abajo, la sustituye
+  const replaceCats = ['top', 'dress', 'bottom', 'hat', 'glasses', 'shoes'];
+  if (replaceCats.includes(p.category)) S.layers = S.layers.filter(l => (S.products.find(x => x.id === l.pid) || {}).category !== p.category);
+  const Ly = { id: uidGen(), pid, ci, si: clamp(si, 0, Math.max(0, (p.sizes || []).length - 1)), x: .5, y: d.y, w: d.w, rot: 0, flip: false, src: null };
+  const order = ['bottom', 'shoes', 'dress', 'top', 'necklace', 'glasses', 'hat', 'other'];
+  const rank = (l) => order.indexOf((S.products.find(x => x.id === l.pid) || {}).category);
+  S.layers.push(Ly); S.layers.sort((a, b) => rank(a) - rank(b));
+  S.sel = Ly.id; loadLayerSrc(Ly);
+  if (!S.photo) useMannequin(true);
+  if (T.mounted) { renderPanel(); }
+}
+function loadLayerSrc(Ly) { const p = S.products.find(x => x.id === Ly.pid); if (!p) return; variant(p, Ly.ci).then(s => { Ly.src = s; requestDraw(); }).catch(() => {}); }
+function pruneLayers() { const before = S.layers.length; S.layers = S.layers.filter(l => S.products.some(p => p.id === l.pid)); if (S.layers.length !== before && !S.layers.some(l => l.id === S.sel)) S.sel = null; S.layers.forEach(l => { if (!l.src) loadLayerSrc(l); }); }
+const selLayer = () => S.layers.find(l => l.id === S.sel);
+
+function normalizePhoto(src) {
+  const [w, hh] = dims(src); const s = Math.min(1, 1400 / Math.max(w, hh));
+  const cv = document.createElement('canvas'); cv.width = Math.round(w * s); cv.height = Math.round(hh * s);
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height); return cv;
+}
+function setPhoto(src, mannequin = false) {
+  S.photo = normalizePhoto(src); S.isMannequin = mannequin;
+  if (T.mounted) { VIEWS.probador.mount($('#view')); }
+}
+async function useMannequin(silent) {
+  try { const img = await loadImg(svgData(MANNEQUIN)); setPhoto(img, true); if (silent) toast('Usando el maniquí. Cambia a tu foto cuando quieras.'); } catch { toast('No se pudo cargar el maniquí.'); }
+}
+async function fileToImage(file) {
+  const url = URL.createObjectURL(file);
+  try { return await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+  finally { setTimeout(() => URL.revokeObjectURL(url), 2000); }
+}
+async function onPhotoFile(e) { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return; try { const img = await fileToImage(f); setPhoto(img); closeDialog(); } catch { toast('No se pudo abrir esa imagen. Prueba con una foto JPG o PNG.'); } }
+$('#fileCam').addEventListener('change', onPhotoFile);
+$('#fileGal').addEventListener('change', onPhotoFile);
+
+function openCamera() {
+  let facing = 'user', stream = null, timer = true, busy = false;
+  const video = h('video', { playsinline: true, autoplay: true, muted: true });
+  video.muted = true;
+  const cd = h('div', { class: 'countdown', 'aria-live': 'assertive' });
+  const wrap = h('div', { class: 'cam-wrap' }, video, cd);
+  const err = h('p', { class: 'err', role: 'alert' });
+  const stop = () => { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; };
+  const timerBtn = h('button', { class: 'btn', type: 'button', 'aria-pressed': 'true', onclick: () => { timer = !timer; timerBtn.setAttribute('aria-pressed', String(timer)); timerBtn.textContent = timer ? 'Temporizador 5 s: sí' : 'Temporizador 5 s: no'; } }, 'Temporizador 5 s: sí');
+  const fallback = h('div', { class: 'row hidden' }, h('button', { class: 'btn primary', type: 'button', onclick: () => $('#fileCam').click() }, svgIcon(ICONS.camera), 'Usar la cámara del teléfono'), h('button', { class: 'btn', type: 'button', onclick: () => $('#fileGal').click() }, svgIcon(ICONS.image), 'Elegir de la galería'));
+  const start = async () => {
+    stop(); err.textContent = '';
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing, width: { ideal: 1080 }, height: { ideal: 1920 } }, audio: false });
+      video.srcObject = stream; video.style.transform = facing === 'user' ? 'scaleX(-1)' : 'none';
+      await video.play().catch(() => {});
+    } catch {
+      wrap.classList.add('hidden'); controls.classList.add('hidden'); fallback.classList.remove('hidden');
+      err.textContent = 'No se pudo abrir la cámara aquí. Haz la foto con la cámara del teléfono o elige una de tu galería.';
+    }
+  };
+  const shoot = async () => {
+    if (busy || !stream) return; busy = true;
+    if (timer) { for (let i = 5; i > 0; i--) { cd.textContent = i; await new Promise(r => setTimeout(r, 1000)); } cd.textContent = ''; }
+    const w = video.videoWidth, hh = video.videoHeight; if (!w) { busy = false; return; }
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = hh; const x = cv.getContext('2d');
+    if (facing === 'user') { x.translate(w, 0); x.scale(-1, 1); }
+    x.drawImage(video, 0, 0, w, hh);
+    stop(); busy = false; closeDialog(); setPhoto(cv);
+  };
+  const controls = h('div', { class: 'row' },
+    h('button', { class: 'btn primary', type: 'button', onclick: shoot }, svgIcon(ICONS.camera), 'Hacer foto'),
+    h('button', { class: 'btn', type: 'button', onclick: () => { facing = facing === 'user' ? 'environment' : 'user'; start(); } }, 'Cambiar cámara'),
+    timerBtn);
+  onDlgClose = stop;
+  openDialog('Hazte una foto', h('p', { class: 'muted' }, 'Ponte de frente, de cuerpo entero y con buena luz. Apoya el teléfono y usa el temporizador para alejarte.'), wrap, controls, fallback, err);
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { wrap.classList.add('hidden'); controls.classList.add('hidden'); fallback.classList.remove('hidden'); }
+  else start();
+}
+
+VIEWS.probador = { mount(v) {
+  teardownStage(); v.replaceChildren();
+  const stageCol = h('div', { class: 'stage-col' });
+  const mirror = h('div', { class: 'mirror' }); const inner = h('div', { class: 'mirror-inner' }); mirror.append(inner);
+  stageCol.append(mirror);
+  T.strip = h('div', { style: 'min-width:0' }); T.panel = h('div', { style: 'display:grid;gap:14px;min-width:0' });
+  const side = h('aside', { class: 'panel', 'aria-label': 'Prendas y ajustes' }, h('h2', null, 'Prendas y accesorios'), T.strip, T.panel);
+  v.append(h('section', { class: 'tryon' }, stageCol, side));
+  T.mounted = true;
+  if (!S.photo) {
+    inner.append(h('div', { class: 'stage-empty' },
+      h('h2', null, 'Tu probador'),
+      h('p', null, 'Hazte una foto de cuerpo entero, de frente y con buena luz. La foto se queda en tu dispositivo.'),
+      h('div', { class: 'col' },
+        h('button', { class: 'btn primary', type: 'button', onclick: openCamera }, svgIcon(ICONS.camera), 'Hacer foto'),
+        h('button', { class: 'btn', type: 'button', onclick: () => $('#fileGal').click() }, svgIcon(ICONS.image), 'Subir una foto'),
+        h('button', { class: 'btn ghost', type: 'button', onclick: () => useMannequin(false) }, svgIcon(ICONS.person), 'Probar con un maniquí'))));
+    T.cv = null;
+  } else {
+    T.cv = h('canvas', { tabindex: '0', 'aria-label': 'Tu imagen con las prendas. Arrastra para mover, pellizca para cambiar tamaño y giro. Con el teclado: flechas para mover, más y menos para tamaño.' });
+    T.cv.width = S.photo.width; T.cv.height = S.photo.height; T.ctx = T.cv.getContext('2d');
+    inner.append(T.cv); bindStage(T.cv);
+    T.wrap = stageCol;
+    stageCol.append(
+      h('p', { class: 'stage-tip' }, 'Toca una prenda para seleccionarla. Arrástrala para colocarla y pellizca con dos dedos para ajustar tamaño y giro.'),
+      h('div', { class: 'row', style: 'justify-content:center' },
+        h('button', { class: 'btn small', type: 'button', onclick: openCamera }, svgIcon(ICONS.camera), 'Otra foto'),
+        h('button', { class: 'btn small', type: 'button', onclick: () => $('#fileGal').click() }, svgIcon(ICONS.image), 'Subir foto'),
+        !S.isMannequin ? h('button', { class: 'btn small', type: 'button', onclick: () => useMannequin(false) }, svgIcon(ICONS.person), 'Maniquí') : null,
+        h('button', { class: 'btn small', type: 'button', onclick: saveLook, disabled: !S.layers.length }, svgIcon(ICONS.download), 'Guardar imagen')));
+    fitStage();
+    T.ro = new ResizeObserver(() => fitStage()); T.ro.observe(stageCol);
+  }
+  renderStrip(); renderPanel(); requestDraw();
+} };
+function fitStage() {
+  if (!T.cv || !S.photo) return;
+  const avail = Math.max(200, (T.wrap?.clientWidth || 320) - 20);
+  const maxH = Math.max(320, window.innerHeight * (window.innerWidth < 920 ? 0.62 : 0.74));
+  const s = Math.min(avail / S.photo.width, maxH / S.photo.height);
+  T.cv.style.width = Math.round(S.photo.width * s) + 'px'; T.cv.style.height = Math.round(S.photo.height * s) + 'px';
+}
+window.addEventListener('resize', fitStage);
+function requestDraw() { if (T.raf || !T.cv) return; T.raf = requestAnimationFrame(() => { T.raf = 0; if (T.cv) drawStage(T.ctx, T.cv.width, T.cv.height, true); }); }
+function layerBox(Ly, W) { const p = S.products.find(x => x.id === Ly.pid) || {}; const [sw, sh] = Ly.src ? dims(Ly.src) : [1, 1]; const lw = Ly.w * W * sizeFactor(Ly, p); return [lw, lw * sh / sw]; }
+function drawStage(ctx, W, H, withSel) {
+  ctx.clearRect(0, 0, W, H);
+  if (S.photo) ctx.drawImage(S.photo, 0, 0, W, H);
+  for (const Ly of S.layers) {
+    if (!Ly.src) continue;
+    const [lw, lh] = layerBox(Ly, W);
+    ctx.save(); ctx.translate(Ly.x * W, Ly.y * H); ctx.rotate(Ly.rot * Math.PI / 180);
+    ctx.save(); if (Ly.flip) ctx.scale(-1, 1); ctx.drawImage(Ly.src, -lw / 2, -lh / 2, lw, lh); ctx.restore();
+    if (withSel && Ly.id === S.sel) {
+      const u = Math.max(2, W / 320);
+      ctx.lineWidth = u; ctx.setLineDash([u * 5, u * 4]);
+      ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.strokeRect(-lw / 2, -lh / 2, lw, lh);
+      ctx.lineDashOffset = u * 4.5; ctx.strokeStyle = 'rgba(15,82,87,.95)'; ctx.strokeRect(-lw / 2, -lh / 2, lw, lh);
+      ctx.setLineDash([]); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#0F5257'; ctx.lineWidth = u;
+      for (const [cx, cy] of [[-lw / 2, -lh / 2], [lw / 2, -lh / 2], [-lw / 2, lh / 2], [lw / 2, lh / 2]]) { ctx.beginPath(); ctx.arc(cx, cy, u * 3.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+    }
+    ctx.restore();
+  }
+}
+function ptOf(e) { const r = T.cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * T.cv.width / r.width, y: (e.clientY - r.top) * T.cv.height / r.height }; }
+function hitTest(pt) {
+  const W = T.cv.width, H = T.cv.height;
+  for (let i = S.layers.length - 1; i >= 0; i--) {
+    const Ly = S.layers[i]; if (!Ly.src) continue;
+    const [lw, lh] = layerBox(Ly, W); const a = -Ly.rot * Math.PI / 180;
+    const dx = pt.x - Ly.x * W, dy = pt.y - Ly.y * H;
+    const rx = dx * Math.cos(a) - dy * Math.sin(a), ry = dx * Math.sin(a) + dy * Math.cos(a);
+    if (Math.abs(rx) <= lw / 2 && Math.abs(ry) <= lh / 2) return Ly;
+  }
+  return null;
+}
+function bindStage(cv) {
+  T.ptrs = new Map(); T.drag = null; T.pinch = null;
+  const startPinch = () => { const Ly = selLayer(); if (!Ly) return; const [a, b] = [...T.ptrs.values()]; T.pinch = { id: Ly.id, d0: Math.hypot(b.x - a.x, b.y - a.y) || 1, a0: Math.atan2(b.y - a.y, b.x - a.x), w0: Ly.w, r0: Ly.rot }; T.drag = null; };
+  cv.addEventListener('pointerdown', (e) => {
+    cv.setPointerCapture(e.pointerId); const p = ptOf(e); T.ptrs.set(e.pointerId, p);
+    if (T.ptrs.size === 1) {
+      const hit = hitTest(p); const prev = S.sel; S.sel = hit ? hit.id : null;
+      if (hit) T.drag = { id: hit.id, sx: p.x, sy: p.y, ox: hit.x, oy: hit.y };
+      if (prev !== S.sel) renderPanel(); requestDraw();
+    } else if (T.ptrs.size === 2) startPinch();
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!T.ptrs.has(e.pointerId)) return; const p = ptOf(e); T.ptrs.set(e.pointerId, p);
+    const Ly = selLayer(); if (!Ly) return;
+    if (T.pinch && T.ptrs.size >= 2) {
+      const [a, b] = [...T.ptrs.values()];
+      Ly.w = clamp(T.pinch.w0 * (Math.hypot(b.x - a.x, b.y - a.y) / T.pinch.d0), .03, 2);
+      Ly.rot = clamp(T.pinch.r0 + (Math.atan2(b.y - a.y, b.x - a.x) - T.pinch.a0) * 180 / Math.PI, -180, 180);
+      syncSliders(); requestDraw();
+    } else if (T.drag && T.drag.id === Ly.id) {
+      Ly.x = clamp(T.drag.ox + (p.x - T.drag.sx) / cv.width, -.2, 1.2); Ly.y = clamp(T.drag.oy + (p.y - T.drag.sy) / cv.height, -.2, 1.2); requestDraw();
+    }
+  });
+  const end = (e) => {
+    T.ptrs.delete(e.pointerId);
+    if (T.ptrs.size < 2) T.pinch = null;
+    if (T.ptrs.size === 1) { const Ly = selLayer(); const p = [...T.ptrs.values()][0]; if (Ly) T.drag = { id: Ly.id, sx: p.x, sy: p.y, ox: Ly.x, oy: Ly.y }; }
+    if (T.ptrs.size === 0) T.drag = null;
+  };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  cv.addEventListener('wheel', (e) => { const Ly = selLayer(); if (!Ly) return; e.preventDefault(); Ly.w = clamp(Ly.w * (e.deltaY < 0 ? 1.05 : 0.952), .03, 2); syncSliders(); requestDraw(); }, { passive: false });
+  cv.addEventListener('keydown', (e) => {
+    const Ly = selLayer(); if (!Ly) return; const st = e.shiftKey ? .03 : .008; let used = true;
+    if (e.key === 'ArrowLeft') Ly.x -= st; else if (e.key === 'ArrowRight') Ly.x += st; else if (e.key === 'ArrowUp') Ly.y -= st; else if (e.key === 'ArrowDown') Ly.y += st;
+    else if (e.key === '+' || e.key === '=') Ly.w = clamp(Ly.w * 1.04, .03, 2); else if (e.key === '-') Ly.w = clamp(Ly.w / 1.04, .03, 2);
+    else if (e.key === 'Delete' || e.key === 'Backspace') { removeLayer(Ly.id); } else used = false;
+    if (used) { e.preventDefault(); syncSliders(); requestDraw(); }
+  });
+}
+function removeLayer(id) { S.layers = S.layers.filter(l => l.id !== id); if (S.sel === id) S.sel = null; renderPanel(); requestDraw(); }
+function renderStrip() {
+  if (!T.strip) return;
+  const prods = visibleProducts();
+  if (!prods.length) { T.strip.replaceChildren(h('p', { class: 'muted' }, S.loaded ? 'No hay productos en el catálogo todavía.' : 'Cargando el catálogo…')); return; }
+  const cats = [...new Set(prods.map(p => p.category))].filter(c => CATS[c]);
+  if (S.cat !== 'all' && !cats.includes(S.cat)) S.cat = 'all';
+  T.strip.replaceChildren(
+    h('div', { class: 'chips', role: 'group', 'aria-label': 'Filtrar por categoría' },
+      h('button', { class: 'chip', type: 'button', 'aria-pressed': String(S.cat === 'all'), onclick: () => { S.cat = 'all'; renderStrip(); } }, 'Todo'),
+      cats.map(c => h('button', { class: 'chip', type: 'button', 'aria-pressed': String(S.cat === c), onclick: () => { S.cat = c; renderStrip(); } }, CATS[c].label))),
+    h('div', { class: 'strip' }, prods.filter(p => S.cat === 'all' || p.category === S.cat).map(p =>
+      h('button', { class: 'strip-item', type: 'button', 'aria-label': 'Probar ' + (p.name || 'producto'), onclick: () => addLayer(p.id, 0, Math.floor(((p.sizes || []).length - 1) / 2)) }, thumb(p, 0, 90), h('span', null, p.name || '')))));
+}
+const SL = {};
+function syncSliders() { const Ly = selLayer(); if (!Ly) return; if (SL.size) SL.size.value = Math.round(Ly.w * 100); if (SL.rot) SL.rot.value = Math.round(Ly.rot); }
+function renderPanel() {
+  if (!T.panel) return;
+  const parts = [];
+  const Ly = selLayer(); const p = Ly && S.products.find(x => x.id === Ly.pid);
+  if (Ly && p) {
+    SL.size = h('input', { type: 'range', min: '3', max: '200', value: Math.round(Ly.w * 100), 'aria-label': 'Tamaño en la imagen', oninput: (e) => { Ly.w = e.target.value / 100; requestDraw(); } });
+    SL.rot = h('input', { type: 'range', min: '-60', max: '60', value: Math.round(Ly.rot), 'aria-label': 'Giro', oninput: (e) => { Ly.rot = +e.target.value; requestDraw(); } });
+    parts.push(h('div', { class: 'panel', style: 'background:var(--surface-2);gap:12px' },
+      h('div', { class: 'sel-head' }, h('div', null, h('h3', null, p.name), h('span', { class: 'muted small-text' }, money(p.price))), h('button', { class: 'btn small danger', type: 'button', onclick: () => removeLayer(Ly.id) }, 'Quitar')),
+      (p.colors || []).length ? h('div', { class: 'field' }, h('div', { class: 'label' }, 'Color: ' + ((p.colors[Ly.ci] || {}).name || '')),
+        h('div', { class: 'swatches' }, p.colors.map((c, i) => h('button', { class: 'swatch', type: 'button', 'aria-label': c.name || 'Color', 'aria-pressed': String(i === Ly.ci), style: 'background:' + (isHex(c.hex) ? c.hex : '#ccc'), onclick: () => { Ly.ci = i; loadLayerSrc(Ly); renderPanel(); } })))) : null,
+      (p.sizes || []).length ? h('div', { class: 'field' }, h('div', { class: 'label' }, 'Talla'),
+        h('div', { class: 'sizes' }, p.sizes.map((s, i) => h('button', { class: 'size', type: 'button', 'aria-pressed': String(i === Ly.si), onclick: () => { Ly.si = i; renderPanel(); requestDraw(); } }, s))),
+        p.sizes.length > 1 ? h('span', { class: 'muted small-text' }, 'Al cambiar de talla la prenda se ajusta en la imagen como referencia.') : null) : null,
+      h('div', { class: 'field' }, h('div', { class: 'label' }, 'Tamaño'), h('div', { class: 'range' }, SL.size)),
+      h('div', { class: 'field' }, h('div', { class: 'label' }, 'Giro'), h('div', { class: 'range' }, SL.rot)),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn small', type: 'button', onclick: () => { Ly.flip = !Ly.flip; requestDraw(); } }, 'Voltear'),
+        h('button', { class: 'btn small', type: 'button', onclick: () => { const i = S.layers.indexOf(Ly); if (i < S.layers.length - 1) { S.layers.splice(i, 1); S.layers.splice(i + 1, 0, Ly); renderPanel(); requestDraw(); } } }, 'Traer delante'),
+        h('button', { class: 'btn small', type: 'button', onclick: () => { const i = S.layers.indexOf(Ly); if (i > 0) { S.layers.splice(i, 1); S.layers.splice(i - 1, 0, Ly); renderPanel(); requestDraw(); } } }, 'Enviar detrás'),
+        h('button', { class: 'btn small', type: 'button', onclick: () => { const d = CATS[p.category] || CATS.other; Ly.x = .5; Ly.y = d.y; Ly.w = d.w; Ly.rot = 0; syncSliders(); requestDraw(); } }, 'Recolocar'))));
+  }
+  if (S.layers.length) {
+    parts.push(h('div', { class: 'field' }, h('h3', null, 'Tu look'),
+      h('div', { class: 'layers' }, [...S.layers].reverse().map(l => { const pp = S.products.find(x => x.id === l.pid) || {}; return h('button', { class: 'layer', type: 'button', 'aria-pressed': String(l.id === S.sel), onclick: () => { S.sel = l.id; renderPanel(); requestDraw(); } }, thumb(pp, l.ci, 44), h('div', null, h('strong', null, pp.name || ''), h('small', null, [(pp.sizes || [])[l.si] && 'Talla ' + pp.sizes[l.si], ((pp.colors || [])[l.ci] || {}).name].filter(Boolean).join(', ')))); }))));
+    const total = S.layers.reduce((a, l) => a + (Number((S.products.find(x => x.id === l.pid) || {}).price) || 0), 0);
+    parts.push(h('div', { class: 'look-total' }, h('div', null, h('div', { class: 'muted small-text' }, 'Total del look'), h('strong', null, money(total))),
+      h('button', { class: 'btn primary', type: 'button', onclick: () => { for (const l of S.layers) { const pp = S.products.find(x => x.id === l.pid); if (pp) addToCart(pp, l.ci, l.si, 1); } toast('Look añadido al carrito'); } }, 'Añadir el look al carrito')));
+  } else if (S.photo) {
+    parts.push(h('p', { class: 'muted' }, 'Elige una prenda de la lista para ponértela.'));
+  }
+  T.panel.replaceChildren(...parts);
+  const saveBtn = [...document.querySelectorAll('.stage-col .btn')].find(b => b.textContent.includes('Guardar imagen'));
+  if (saveBtn) saveBtn.disabled = !S.layers.length;
+}
+async function saveLook() {
+  if (!S.photo) return;
+  const cv = document.createElement('canvas'); cv.width = S.photo.width; cv.height = S.photo.height;
+  drawStage(cv.getContext('2d'), cv.width, cv.height, false);
+  let blob;
+  try { blob = await canvasToBlob(cv, 'image/jpeg', .9); } catch { toast('No se pudo crear la imagen.'); return; }
+  if (S.downloads) {
+    try { await S.downloads.save({ filename: 'mi-look.jpg', data: blob }); toast('Imagen guardada'); } catch (e) { if (e && e.code !== 'declined') toast('No se pudo guardar la imagen.'); }
+    return;
+  }
+  const a = h('a', { href: URL.createObjectURL(blob), download: 'mi-look.jpg' }); document.body.append(a); a.click(); a.remove();
+}
+
+/* ---------- Gestión ---------- */
+VIEWS.gestion = { mount(v) {
+  if (!S.isAdmin && S.backend === 'firebase') {
+    const err = h('p', { class: 'err', role: 'alert' });
+    const em = h('input', { id: 'lgEmail', type: 'email', autocomplete: 'username', required: true });
+    const pw = h('input', { id: 'lgPass', type: 'password', autocomplete: 'current-password', required: true });
+    const btn = h('button', { class: 'btn primary', type: 'submit' }, 'Entrar');
+    v.append(h('h1', { class: 'page-title' }, 'Acceso para la tienda'),
+      h('form', { class: 'form panel', style: 'max-width:26rem', onsubmit: async (e) => {
+        e.preventDefault(); err.textContent = ''; btn.disabled = true; btn.textContent = 'Entrando…';
+        try {
+          const cred = await S.auth.signInWithEmailAndPassword(em.value.trim(), pw.value);
+          const admins = (window.ADMIN_EMAILS || []).map(x => String(x).trim().toLowerCase());
+          if (!admins.includes((cred.user.email || '').toLowerCase())) { await S.auth.signOut(); throw new Error('no-admin'); }
+          location.hash = 'gestion'; location.reload();
+        } catch (ex) {
+          btn.disabled = false; btn.textContent = 'Entrar';
+          err.textContent = ex && ex.message === 'no-admin' ? 'Esta cuenta no gestiona la tienda.' : 'Correo o contraseña incorrectos.';
+        }
+      } },
+        h('div', { class: 'field' }, h('label', { for: 'lgEmail' }, 'Correo'), em),
+        h('div', { class: 'field' }, h('label', { for: 'lgPass' }, 'Contraseña'), pw),
+        err, btn));
+    return;
+  }
+  if (!S.isAdmin) { v.append(h('div', { class: 'empty' }, h('h2', null, 'Solo para la tienda'), h('p', { class: 'muted' }, 'Esta sección es para quien gestiona el catálogo y los pedidos.'))); return; }
+  v.append(h('div', { class: 'row', style: 'justify-content:space-between;margin-bottom:18px' }, h('h1', { class: 'page-title', style: 'margin:0' }, 'Gestión de la tienda'),
+    S.backend === 'firebase' ? h('button', { class: 'btn small', type: 'button', onclick: async () => { await S.auth.signOut(); location.hash = ''; location.reload(); } }, 'Cerrar sesión') : null));
+  if (S.mode === 'local') v.append(h('div', { class: 'note' }, S.fbError || 'Modo demostración: configura Firebase en config.js para guardar el catálogo y los pedidos en línea. Ahora todo se guarda solo en este navegador.'));
+  const tab = (k, l) => h('button', { class: 'chip', type: 'button', 'aria-pressed': String(S.adminTab === k), onclick: () => { S.adminTab = k; mount(); } }, l);
+  v.append(h('div', { class: 'subtabs', role: 'group', 'aria-label': 'Secciones de gestión' }, tab('productos', 'Productos'), tab('pedidos', 'Pedidos' + (S.allOrders.length ? ' (' + S.allOrders.length + ')' : '')), tab('tienda', 'Tienda')));
+  if (S.adminTab === 'productos') {
+    v.append(h('div', { class: 'row', style: 'margin-bottom:14px' },
+      h('button', { class: 'btn primary', type: 'button', onclick: () => openProductForm(null) }, 'Añadir producto'),
+      !S.products.length ? h('button', { class: 'btn', type: 'button', onclick: seedSamples }, 'Cargar productos de ejemplo') : null));
+    if (!S.products.length) { v.append(h('p', { class: 'muted' }, 'Aún no hay productos. Sube una foto de cada prenda sobre fondo liso, de frente, y la app quitará el fondo.')); return; }
+    v.append(h('div', { class: 'list' }, S.products.map(p => h('div', { class: 'admin-row' + (p.active === false ? ' off' : '') },
+      thumb(p, 0, 56),
+      h('div', null, h('div', { class: 'item-name' }, p.name || ''), h('div', { class: 'muted small-text' }, [CATS[p.category]?.label, money(p.price), (p.colors || []).length + ' colores', p.active === false ? 'Oculto' : null].filter(Boolean).join(' · '))),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn small', type: 'button', onclick: () => openProductForm(p) }, 'Editar'),
+        h('button', { class: 'btn small danger', type: 'button', onclick: async () => { if (!confirm('¿Eliminar ' + (p.name || 'este producto') + '?')) return; try { await deleteProduct(p); toast('Producto eliminado'); } catch { toast('No se pudo eliminar.'); } } }, 'Eliminar'))))));
+  } else if (S.adminTab === 'pedidos') {
+    if (!S.allOrders.length) { v.append(h('p', { class: 'muted' }, 'Todavía no hay pedidos.')); return; }
+    v.append(h('div', { class: 'list' }, S.allOrders.map(o => orderCard(o, true))));
+  } else {
+    const name = h('input', { id: 'stName', type: 'text', value: S.settings.name || '' });
+    const cur = h('select', { id: 'stCur' }, CURRENCIES.map(c => { const o = h('option', { value: c }, c); if (c === (S.settings.currency || 'EUR')) o.selected = true; return o; }));
+    v.append(h('form', { class: 'form panel', style: 'max-width:30rem', onsubmit: async (e) => { e.preventDefault(); try { await saveSettings({ name: name.value.trim() || 'Probador', currency: cur.value }); toast('Cambios guardados'); } catch { toast('No se pudieron guardar los cambios.'); } } },
+      h('div', { class: 'field' }, h('label', { for: 'stName' }, 'Nombre de la tienda'), name),
+      h('div', { class: 'field' }, h('label', { for: 'stCur' }, 'Moneda'), cur),
+      h('button', { class: 'btn primary', type: 'submit' }, 'Guardar cambios')));
+  }
+} };
+
+async function seedSamples() {
+  toast('Cargando productos de ejemplo…');
+  try {
+    const base = Date.now();
+    for (let i = 0; i < SAMPLES.length; i++) {
+      const s = SAMPLES[i];
+      const image = await storeSvg(s.svg);
+      await saveProductRecord(null, { name: s.name, price: s.price, category: s.category, description: s.description, sizes: s.sizes, colors: s.colors, tint: true, active: true, image, createdAt: new Date(base - i * 1000).toISOString() });
+    }
+    toast('Productos de ejemplo cargados');
+  } catch (e) { toast(e && e.message && !e.code ? e.message : 'No se pudieron cargar los ejemplos.'); }
+}
+
+/* Procesado de imágenes: quitar fondo liso y recortar */
+function shrink(cv, max) { const s = Math.min(1, max / Math.max(cv.width, cv.height)); if (s === 1) return cv; const o = document.createElement('canvas'); o.width = Math.round(cv.width * s); o.height = Math.round(cv.height * s); o.getContext('2d').drawImage(cv, 0, 0, o.width, o.height); return o; }
+function processImage(img, remove, tol) {
+  const [w0, h0] = dims(img); const s = Math.min(1, 1200 / Math.max(w0, h0));
+  const cv = document.createElement('canvas'); cv.width = Math.round(w0 * s); cv.height = Math.round(h0 * s);
+  const x = cv.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0, cv.width, cv.height);
+  const W = cv.width, H = cv.height; const d = x.getImageData(0, 0, W, H); const p = d.data;
+  if (remove) {
+    const corners = [0, W - 1, (H - 1) * W, H * W - 1]; const ref = [0, 0, 0];
+    corners.forEach(k => { ref[0] += p[k * 4]; ref[1] += p[k * 4 + 1]; ref[2] += p[k * 4 + 2]; }); ref.forEach((_, i) => ref[i] /= 4);
+    const t2 = tol * tol * 3; const seen = new Uint8Array(W * H); const st = [];
+    for (let i = 0; i < W; i++) { st.push(i, (H - 1) * W + i); } for (let j = 0; j < H; j++) { st.push(j * W, j * W + W - 1); }
+    while (st.length) {
+      const k = st.pop(); if (seen[k]) continue; seen[k] = 1; const i = k * 4;
+      if (p[i + 3] !== 0) { const dr = p[i] - ref[0], dg = p[i + 1] - ref[1], db = p[i + 2] - ref[2]; if (dr * dr + dg * dg + db * db > t2) continue; }
+      p[i + 3] = 0; const xx = k % W, yy = (k / W) | 0;
+      if (xx > 0) st.push(k - 1); if (xx < W - 1) st.push(k + 1); if (yy > 0) st.push(k - W); if (yy < H - 1) st.push(k + W);
+    }
+    // suavizar bordes: píxeles opacos junto a transparentes quedan semitransparentes
+    for (let k = 0; k < W * H; k++) { if (p[k * 4 + 3] === 0) continue; const xx = k % W, yy = (k / W) | 0; let n = 0; if (xx > 0 && p[(k - 1) * 4 + 3] === 0) n++; if (xx < W - 1 && p[(k + 1) * 4 + 3] === 0) n++; if (yy > 0 && p[(k - W) * 4 + 3] === 0) n++; if (yy < H - 1 && p[(k + W) * 4 + 3] === 0) n++; if (n) p[k * 4 + 3] = Math.min(p[k * 4 + 3], 255 - n * 45); }
+    x.putImageData(d, 0, 0);
+  }
+  // recortar al contenido
+  let minX = W, minY = H, maxX = -1, maxY = -1;
+  for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) if (p[(yy * W + xx) * 4 + 3] > 12) { if (xx < minX) minX = xx; if (xx > maxX) maxX = xx; if (yy < minY) minY = yy; if (yy > maxY) maxY = yy; }
+  if (maxX < 0) return cv;
+  const o = document.createElement('canvas'); o.width = maxX - minX + 1; o.height = maxY - minY + 1;
+  o.getContext('2d').drawImage(cv, minX, minY, o.width, o.height, 0, 0, o.width, o.height);
+  return o;
+}
+
+function openProductForm(p) {
+  const f = {
+    name: p?.name || '', price: p?.price ?? '', category: p?.category || 'top', description: p?.description || '',
+    sizes: (p?.sizes || CATS[p?.category || 'top'].sizes).join(', '), sizesTouched: !!p,
+    tint: p ? !!p.tint : true, active: p ? p.active !== false : true, image: p?.image || null,
+    colors: (p?.colors && p.colors.length ? p.colors : [{ name: 'Original', hex: '#FFFFFF' }]).map(c => ({ name: c.name || '', hex: isHex(c.hex) ? c.hex : '#FFFFFF', image: c.image || null, processed: null })),
+    raw: null, processed: null, remove: true, tol: 40
+  };
+  const err = h('p', { class: 'err', role: 'alert' });
+  const prev = h('div', { class: 'checker' });
+  const showPrev = () => {
+    const cv = h('canvas', { 'aria-hidden': 'true' }); prev.replaceChildren(cv);
+    if (f.processed) drawFit(cv, f.processed, 260);
+    else if (f.image) loadImg(srcOf(f.image)).then(s => drawFit(cv, s, 260)).catch(() => prev.replaceChildren(h('span', { class: 'muted' }, 'Sin imagen')));
+    else prev.replaceChildren(h('span', { class: 'muted' }, 'Sube la foto de la prenda'));
+  };
+  let tTol; const reprocess = () => { if (!f.raw) return; f.processed = processImage(f.raw, f.remove, f.tol); showPrev(); };
+  const fileIn = h('input', { type: 'file', accept: 'image/*', id: 'pfImg', class: 'hidden', onchange: async (e) => { const file = e.target.files[0]; e.target.value = ''; if (!file) return; try { f.raw = await fileToImage(file); reprocess(); } catch { err.textContent = 'No se pudo abrir esa imagen.'; } } });
+  const tolIn = h('input', { type: 'range', min: '5', max: '120', value: String(f.tol), 'aria-label': 'Sensibilidad al quitar el fondo', oninput: (e) => { f.tol = +e.target.value; clearTimeout(tTol); tTol = setTimeout(reprocess, 180); } });
+  const sizesIn = h('input', { id: 'pfSizes', type: 'text', value: f.sizes, oninput: (e) => { f.sizes = e.target.value; f.sizesTouched = true; } });
+  const catSel = h('select', { id: 'pfCat', onchange: (e) => { f.category = e.target.value; if (!f.sizesTouched) { f.sizes = CATS[f.category].sizes.join(', '); sizesIn.value = f.sizes; } } },
+    Object.entries(CATS).map(([k, c]) => { const o = h('option', { value: k }, c.label); if (k === f.category) o.selected = true; return o; }));
+  const colorsBox = h('div', { class: 'form', style: 'gap:8px' });
+  const drawColors = () => colorsBox.replaceChildren(...f.colors.map((c, i) => {
+    const mini = h('div', { class: 'mini checker', style: 'min-height:0;padding:2px' });
+    const mc = h('canvas'); mini.append(mc);
+    if (c.processed) drawFit(mc, c.processed, 36); else if (c.image) loadImg(srcOf(c.image)).then(s => drawFit(mc, s, 36)).catch(() => {}); else mini.replaceChildren();
+    const fi = h('input', { type: 'file', accept: 'image/*', class: 'hidden', onchange: async (e) => { const file = e.target.files[0]; e.target.value = ''; if (!file) return; try { c.processed = processImage(await fileToImage(file), f.remove, f.tol); drawColors(); } catch { err.textContent = 'No se pudo abrir esa imagen.'; } } });
+    return h('div', { class: 'color-row' },
+      h('input', { type: 'color', value: c.hex.toLowerCase(), 'aria-label': 'Color ' + (i + 1), oninput: (e) => { c.hex = e.target.value.toUpperCase(); } }),
+      h('input', { type: 'text', value: c.name, placeholder: 'Nombre del color', 'aria-label': 'Nombre del color ' + (i + 1), oninput: (e) => { c.name = e.target.value; } }),
+      h('div', { class: 'row', style: 'gap:4px' }, (c.image || c.processed) ? mini : null, h('button', { class: 'btn small', type: 'button', title: 'Foto propia de este color', onclick: () => fi.click() }, (c.image || c.processed) ? 'Cambiar foto' : 'Foto'), fi),
+      h('button', { class: 'btn small danger', type: 'button', 'aria-label': 'Quitar color', disabled: f.colors.length <= 1, onclick: () => { f.colors.splice(i, 1); drawColors(); } }, '×'));
+  }));
+  showPrev(); drawColors();
+  const saveBtn = h('button', { class: 'btn primary', type: 'submit' }, p ? 'Guardar cambios' : 'Guardar producto');
+  const form = h('form', { class: 'form', novalidate: true, onsubmit: async (e) => {
+    e.preventDefault(); err.textContent = '';
+    const name = form.querySelector('#pfName').value.trim(); const price = parseFloat(String(form.querySelector('#pfPrice').value).replace(',', '.'));
+    if (!name) { err.textContent = 'Escribe el nombre del producto.'; return; }
+    if (!(price >= 0)) { err.textContent = 'Escribe un precio válido.'; return; }
+    if (!f.processed && !f.image) { err.textContent = 'Sube una foto de la prenda.'; return; }
+    const sizes = f.sizes.split(',').map(s => s.trim()).filter(Boolean).slice(0, 20);
+    saveBtn.disabled = true; saveBtn.textContent = 'Guardando…';
+    try {
+      const image = f.processed ? await storeImage(f.processed) : f.image;
+      const colors = [];
+      for (const c of f.colors) { const o = { name: c.name.trim() || 'Color', hex: isHex(c.hex) ? c.hex : '#FFFFFF' }; const im = c.processed ? await storeImage(c.processed) : c.image; if (im) o.image = im; colors.push(o); }
+      const now = new Date().toISOString();
+      await saveProductRecord(p ? p.id : null, { name, price: Math.round(price * 100) / 100, category: f.category, description: form.querySelector('#pfDesc').value.trim(), sizes: sizes.length ? sizes : ['Única'], colors, tint: form.querySelector('#pfTint').checked, active: form.querySelector('#pfActive').checked, image, createdAt: p?.createdAt || now, updatedAt: now });
+      tintCache.clear(); closeDialog(); toast(p ? 'Cambios guardados' : 'Producto guardado');
+    } catch (ex) {
+      saveBtn.disabled = false; saveBtn.textContent = p ? 'Guardar cambios' : 'Guardar producto';
+      err.textContent = ex && ex.message && !ex.code ? ex.message : (ex && ex.code === 'quota_exceeded' ? 'No queda espacio para más imágenes o productos.' : 'No se pudo guardar. Inténtalo de nuevo.');
+    }
+  } },
+    h('div', { class: 'field' }, h('div', { class: 'label' }, 'Foto de la prenda'), prev,
+      h('div', { class: 'row' }, h('button', { class: 'btn', type: 'button', onclick: () => fileIn.click() }, svgIcon(ICONS.image), f.image ? 'Cambiar foto' : 'Elegir foto'), fileIn),
+      h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: f.remove, onchange: (e) => { f.remove = e.target.checked; reprocess(); } }), h('span', null, 'Quitar el fondo liso automáticamente')),
+      h('div', { class: 'range' }, h('span', { class: 'small-text muted' }, 'Sensibilidad'), tolIn),
+      h('p', { class: 'muted small-text' }, 'Funciona mejor con la prenda de frente, sin arrugas y sobre fondo blanco o de un solo color. También puedes subir un PNG sin fondo.')),
+    h('div', { class: 'field' }, h('label', { for: 'pfName' }, 'Nombre'), h('input', { id: 'pfName', type: 'text', value: f.name })),
+    h('div', { class: 'two' },
+      h('div', { class: 'field' }, h('label', { for: 'pfPrice' }, 'Precio (' + (S.settings.currency || 'EUR') + ')'), h('input', { id: 'pfPrice', type: 'text', inputmode: 'decimal', value: String(f.price) })),
+      h('div', { class: 'field' }, h('label', { for: 'pfCat' }, 'Categoría'), catSel)),
+    h('div', { class: 'field' }, h('label', { for: 'pfDesc' }, 'Descripción'), h('textarea', { id: 'pfDesc' }, f.description)),
+    h('div', { class: 'field' }, h('label', { for: 'pfSizes' }, 'Tallas, separadas por comas'), sizesIn),
+    h('div', { class: 'field' }, h('div', { class: 'label' }, 'Colores'), colorsBox, h('div', null, h('button', { class: 'btn small', type: 'button', onclick: () => { f.colors.push({ name: '', hex: '#2E2E30', image: null, processed: null }); drawColors(); } }, 'Añadir color'))),
+    h('label', { class: 'check' }, h('input', { id: 'pfTint', type: 'checkbox', checked: f.tint }), h('span', null, 'Teñir la foto con el color elegido. Actívalo si la foto base es blanca o gris claro; los colores con foto propia no se tiñen.')),
+    h('label', { class: 'check' }, h('input', { id: 'pfActive', type: 'checkbox', checked: f.active }), h('span', null, 'Visible en el catálogo')),
+    err, h('div', { class: 'row' }, saveBtn, h('button', { class: 'btn ghost', type: 'button', onclick: closeDialog }, 'Cancelar')));
+  openDialog(p ? 'Editar producto' : 'Nuevo producto', form);
+}
+
+/* ---------- PWA ---------- */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+
+boot();
+})();
+</script>
+</body>
+</html>
